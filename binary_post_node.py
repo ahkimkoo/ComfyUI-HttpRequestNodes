@@ -68,6 +68,7 @@ class BinaryPostRequestNode:
                     data=body_bytes,
                     headers=request_headers,
                     timeout=300,
+                    proxies={"http": None, "https": None},
                 )
                 resp_headers = dict(resp.headers)
                 try:

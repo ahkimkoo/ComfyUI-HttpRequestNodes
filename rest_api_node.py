@@ -76,20 +76,21 @@ class RestApiNode:
                 pass
         
         def send_request():
+            proxies = {"http": None, "https": None}
             if method == "GET":
-                return requests.get(target_url, params=params, headers=request_headers)
+                return requests.get(target_url, params=params, headers=request_headers, proxies=proxies)
             elif method == "POST":
-                return requests.post(target_url, json=body_data, headers=request_headers)
+                return requests.post(target_url, json=body_data, headers=request_headers, proxies=proxies)
             elif method == "PUT":
-                return requests.put(target_url, json=body_data, headers=request_headers)
+                return requests.put(target_url, json=body_data, headers=request_headers, proxies=proxies)
             elif method == "DELETE":
-                return requests.delete(target_url, headers=request_headers)
+                return requests.delete(target_url, headers=request_headers, proxies=proxies)
             elif method == "PATCH":
-                return requests.patch(target_url, json=body_data, headers=request_headers)
+                return requests.patch(target_url, json=body_data, headers=request_headers, proxies=proxies)
             elif method == "HEAD":
-                return requests.head(target_url, headers=request_headers)
+                return requests.head(target_url, headers=request_headers, proxies=proxies)
             elif method == "OPTIONS":
-                return requests.options(target_url, headers=request_headers)
+                return requests.options(target_url, headers=request_headers, proxies=proxies)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
         

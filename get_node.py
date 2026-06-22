@@ -31,7 +31,7 @@ class GetRequestNode:
         
 
         try:
-            response = requests.get(target_url, params=query_list, headers=request_headers)
+            response = requests.get(target_url, params=query_list, headers=request_headers, proxies={"http": None, "https": None})
             
             text_output = response.text
             file_output = response.content

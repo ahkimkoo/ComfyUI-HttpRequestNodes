@@ -14,6 +14,7 @@ from .audio_to_blob_node import AudioToBlobNode
 from .video_to_blob_node import VideoToBlobNode
 from .binary_post_node import BinaryPostRequestNode
 from .media_form_post_node import MediaFormPostNode
+from .blob_to_image_node import BlobToImageNode
 
 
 
@@ -32,4 +33,5 @@ NODE_CLASS_MAPPINGS = {
     "Video To Blob Node": VideoToBlobNode,
     "Binary Post Request Node": BinaryPostRequestNode,
     "Media Form Post Node": MediaFormPostNode,
+    "Blob To Image Node": BlobToImageNode,
 }

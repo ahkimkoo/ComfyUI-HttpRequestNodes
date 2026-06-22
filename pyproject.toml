@@ -1,14 +1,14 @@
 [project]
-name = "ComfyUI-MediaRequestNodes"
-description = "This is a request node tool designed for making HTTP requests (GET/POST) to APIs and viewing the responses. It is useful for API testing and development."
+name = "ComfyUI-HttpRequestNodes"
+description = "Extended HTTP request nodes for ComfyUI — supports image, audio, video binary data, form-data upload, and raw binary I/O. Fork of felixszeto/ComfyUI-RequestNodes."
 version = "1.1.0"
 license = {file = "LICENSE"}
 
 [project.urls]
-Repository = "https://github.com/ahkimkoo/ComfyUI-RequestNodes"
+Repository = "https://github.com/ahkimkoo/ComfyUI-HttpRequestNodes"
 #  Used by Comfy Registry https://comfyregistry.org
 
 [tool.comfy]
 PublisherId = "ahkimkoo"
-DisplayName = "Media Request Nodes"
+DisplayName = "ComfyUI-HttpRequestNodes"
 Icon = ""

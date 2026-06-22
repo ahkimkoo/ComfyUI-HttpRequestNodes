@@ -1,4 +1,4 @@
-# ComfyUI-RequestNodes
+# ComfyUI-HttpRequestNodes
 
 > **扩展版本** — 本仓库 fork 自 [felixszeto/ComfyUI-RequestNodes](https://github.com/felixszeto/ComfyUI-RequestNodes)（原项目仅支持图片上传），在此基础上新增了对音频（AUDIO）、视频（VIDEO）二进制数据的 HTTP 发送与接收能力，以及原始二进制 POST 请求和多媒体 Form 上传支持。
 >
@@ -178,7 +178,7 @@ To install ComfyUI-RequestNodes, follow these steps:
     *   Run the following command to clone the repository:
 
     ```bash
-    git clone https://github.com/ahkimkoo/ComfyUI-RequestNodes.git
+    git clone https://github.com/ahkimkoo/ComfyUI-HttpRequestNodes.git
     ```
 
 3.  **Install dependencies.**

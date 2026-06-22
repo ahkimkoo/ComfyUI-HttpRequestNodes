@@ -29,6 +29,7 @@ class BinaryPostRequestNode:
     RETURN_TYPES = ("STRING", "BYTES", "JSON", "INT", "DICT")
     RETURN_NAMES = ("text", "response_bytes", "json", "status_code", "response_headers")
     FUNCTION = "send_request"
+    OUTPUT_NODE = True
     CATEGORY = "RequestNode/REST API"
 
     def send_request(self, target_url, body, method="POST", content_type="application/octet-stream",

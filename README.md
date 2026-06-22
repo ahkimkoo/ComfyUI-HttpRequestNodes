@@ -1,5 +1,9 @@
 # ComfyUI-RequestNodes
 
+> **扩展版本** — 本仓库 fork 自 [felixszeto/ComfyUI-RequestNodes](https://github.com/felixszeto/ComfyUI-RequestNodes)（原项目仅支持图片上传），在此基础上新增了对音频（AUDIO）、视频（VIDEO）二进制数据的 HTTP 发送与接收能力，以及原始二进制 POST 请求和多媒体 Form 上传支持。
+>
+> 原项目节点完全兼容，所有新增节点均遵循原项目的设计模式。
+
 [中文版本](README_zh.md)
 
 ## Introduction
@@ -16,6 +20,138 @@ ComfyUI-RequestNodes is a custom node plugin for ComfyUI that provides functiona
 *   **Chain Image Node**: Uploads an image and adds it to an image batch, allowing for chaining to build a batch from multiple images.
 *   **String Replace Node**: Replaces placeholders in a string with provided values.
 *   **Retry Settings Node**: Creates retry setting configurations for the Rest Api Node.
+
+### New Nodes (Extended)
+
+*   **Audio To Blob Node**: Converts ComfyUI AUDIO type to WAV binary bytes for HTTP transmission.
+*   **Video To Blob Node**: Converts ComfyUI VIDEO type (VHS path or frame tensor) to MP4/GIF binary bytes.
+*   **Binary Post Request Node**: Sends raw binary data (BYTES) via HTTP POST/PUT/PATCH with `application/octet-stream` content type.
+*   **Media Form Post Node**: Sends multimedia data (IMAGE/AUDIO/VIDEO) via `multipart/form-data` in a single request.
+*   **Blob To Image Node**: Decodes binary image data (PNG/JPEG/BMP/WebP bytes) to ComfyUI IMAGE type.
+*   **Blob To Batch Image Node**: Decodes binary image data to IMAGE type, supporting multi-page TIFF.
+*   **Blob To Audio Node**: Decodes binary audio data (WAV bytes) to ComfyUI AUDIO type.
+*   **Blob To Video Node**: Decodes binary video data (MP4/GIF/WebM bytes) to ComfyUI VIDEO type.
+
+---
+
+## Node Details
+
+### Audio To Blob Node
+
+Converts ComfyUI `AUDIO` type to WAV binary bytes (`BYTES`). Uses `soundfile` for WAV encoding. Output is suitable for HTTP POST as `application/octet-stream`.
+
+*   **Category**: RequestNode/Converters
+*   **Inputs**:
+    *   `audio` (AUDIO, required): The audio data to convert.
+*   **Outputs**:
+    *   `wav_bytes` (BYTES): The audio encoded as WAV binary data.
+
+### Video To Blob Node
+
+Converts ComfyUI `VIDEO` type to MP4 or GIF binary bytes. Supports both VHS-style path-based VIDEO and frame tensor VIDEO. Uses `imageio` for encoding.
+
+*   **Category**: RequestNode/Converters
+*   **Inputs**:
+    *   `video` (VIDEO, required): The video data to convert.
+    *   `format` (Dropdown, optional): Output format, `mp4` (default) or `gif`.
+    *   `fps` (INT, optional): Frames per second (default: 24). Ignored for VHS-style VIDEO that already has metadata.
+*   **Outputs**:
+    *   `video_bytes` (BYTES): The video encoded as binary data.
+
+### Binary Post Request Node
+
+Sends raw binary data via HTTP POST/PUT/PATCH. The body is sent as `application/octet-stream`. This is the core node for transmitting audio/video binary data to external APIs (e.g., SVC voice conversion services).
+
+*   **Category**: RequestNode/REST API
+*   **Inputs**:
+    *   `target_url` (STRING, required): The URL to send the request to.
+    *   `body` (BYTES, required): The binary data to send. Connect output from Audio/Video/Image To Blob nodes.
+    *   `method` (Dropdown, required): HTTP method — `POST` (default), `PUT`, or `PATCH`.
+    *   `content_type` (STRING, optional): Content-Type header, default `application/octet-stream`.
+    *   `headers` (KEY_VALUE, optional): Additional request headers (e.g., Authorization). From Key/Value Node.
+*   **Outputs**:
+    *   `text` (STRING): Response body as text.
+    *   `response_bytes` (BYTES): Response body as raw bytes. Connect to Blob To Audio/Image/Video nodes to decode.
+    *   `json` (JSON): Response parsed as JSON (if valid).
+    *   `status_code` (INT): HTTP status code.
+    *   `response_headers` (DICT): Response headers as dictionary.
+
+### Media Form Post Node
+
+Sends multimedia data via `multipart/form-data`. Can attach IMAGE, AUDIO, and VIDEO in a single request, along with additional form fields and headers. Supports binary data from Image/Audio/Video To Blob nodes.
+
+*   **Category**: RequestNode/Post Request
+*   **Inputs**:
+    *   `target_url` (STRING, required): The URL to send the request to.
+    *   `form_fields` (KEY_VALUE, optional): Additional form fields. From Key/Value Node.
+    *   `headers` (KEY_VALUE, optional): Request headers (e.g., Authorization). From Key/Value Node.
+    *   `image` (IMAGE, optional): Image data to attach.
+    *   `image_field_name` (STRING, optional): Form field name for image, default `image`.
+    *   `image_bytes` (BYTES, optional): Pre-encoded image binary data (alternative to IMAGE input).
+    *   `audio_bytes` (BYTES, optional): Audio binary data to attach. From Audio To Blob Node.
+    *   `audio_field_name` (STRING, optional): Form field name for audio, default `audio`.
+    *   `video_bytes` (BYTES, optional): Video binary data to attach. From Video To Blob Node.
+    *   `video_field_name` (STRING, optional): Form field name for video, default `video`.
+*   **Outputs**:
+    *   `text` (STRING): Response body as text.
+    *   `json` (JSON): Response parsed as JSON (if valid).
+    *   `status_code` (INT): HTTP status code.
+    *   `response_bytes` (BYTES): Response body as raw bytes.
+    *   `response_headers` (DICT): Response headers as dictionary.
+
+### Blob To Image Node
+
+Decodes binary image data (PNG/JPEG/BMP/WebP bytes) to ComfyUI `IMAGE` type. Useful for converting HTTP response bytes back to images.
+
+*   **Category**: RequestNode/Utils
+*   **Inputs**:
+    *   `bytes` (BYTES, required): The binary image data to decode.
+*   **Outputs**:
+    *   `image` (IMAGE): Decoded image as ComfyUI IMAGE tensor `[batch, height, width, channels]`.
+
+### Blob To Batch Image Node
+
+Decodes binary image data to ComfyUI `IMAGE` type. Supports multi-page TIFF files, returning all pages as a batch. Single-page images return batch size 1.
+
+*   **Category**: RequestNode/Utils
+*   **Inputs**:
+    *   `bytes` (BYTES, required): The binary image data to decode.
+*   **Outputs**:
+    *   `image` (IMAGE): Decoded image(s) as IMAGE tensor. Multi-page TIFF returns all pages as batch.
+
+### Blob To Audio Node
+
+Decodes binary audio data (WAV bytes) to ComfyUI `AUDIO` type. Output is compatible with PreviewAudio, SaveAudio, and other audio nodes.
+
+*   **Category**: RequestNode/Utils
+*   **Inputs**:
+    *   `bytes` (BYTES, required): The binary WAV data to decode.
+*   **Outputs**:
+    *   `audio` (AUDIO): Decoded audio as `{"waveform": Tensor [batch, channels, samples], "sample_rate": int}`.
+
+### Blob To Video Node
+
+Decodes binary video data (MP4/GIF/WebM bytes) to ComfyUI `VIDEO` type. Output is compatible with VHS (Video Helper Suite) nodes for preview and further processing.
+
+*   **Category**: RequestNode/Utils
+*   **Inputs**:
+    *   `bytes` (BYTES, required): The binary video data to decode.
+*   **Outputs**:
+    *   `video` (VIDEO): Decoded video as ComfyUI VIDEO type (path-based).
+
+---
+
+## Example Workflows
+
+The following workflow templates are included in ComfyUI's workflow list:
+
+*   **svc-all-endpoints** — SVC voice conversion service integration with 4 groups:
+    *   ① List Roles (GET /roles)
+    *   ② Train Voice (POST /train/{name}) — disabled by default
+    *   ③ Voice Conversion (POST /rvc/{name}) — enabled by default
+    *   ④ Clone Role (POST /role/{name}) — disabled by default
+
+---
 
 ## Test Resources
 
@@ -42,15 +178,22 @@ To install ComfyUI-RequestNodes, follow these steps:
     *   Run the following command to clone the repository:
 
     ```bash
-    git clone https://github.com/felixszeto/ComfyUI-RequestNodes.git
+    git clone https://github.com/ahkimkoo/ComfyUI-RequestNodes.git
     ```
 
-3.  **Restart ComfyUI.**
+3.  **Install dependencies.**
+    *   The extended nodes require `soundfile` and `imageio` for audio/video encoding. Install them in your ComfyUI Python environment:
+
+    ```bash
+    pip install soundfile imageio imageio-ffmpeg
+    ```
+
+4.  **Restart ComfyUI.**
     *   Close and restart ComfyUI to load the newly installed nodes.
 
 ## Usage
 
-After installation, you can find the nodes under the "RequestNode" category in the ComfyUI node list, with subcategories like "Get Request", "Post Request", "REST API", and "Utils".
+After installation, you can find the nodes under the "RequestNode" category in the ComfyUI node list, with subcategories like "Get Request", "Post Request", "REST API", "Converters", and "Utils".
 
 *   **Get Request Node**:
     *   **Category**: RequestNode/Get Request

@@ -10,6 +10,10 @@ from .form_post_node import FormPostRequestNode
 from .image_to_base64_node import ImageToBase64Node
 from .image_to_blob_node import ImageToBlobNode
 from .image_list_combiner_node import ChainableUploadImage
+from .audio_to_blob_node import AudioToBlobNode
+from .video_to_blob_node import VideoToBlobNode
+from .binary_post_node import BinaryPostRequestNode
+from .media_form_post_node import MediaFormPostNode
 
 
 
@@ -24,4 +28,8 @@ NODE_CLASS_MAPPINGS = {
     "Image To Base64 Node": ImageToBase64Node,
     "Image To Blob Node": ImageToBlobNode,
     "Chainable Upload Image": ChainableUploadImage,
+    "Audio To Blob Node": AudioToBlobNode,
+    "Video To Blob Node": VideoToBlobNode,
+    "Binary Post Request Node": BinaryPostRequestNode,
+    "Media Form Post Node": MediaFormPostNode,
 }

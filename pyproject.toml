@@ -1,7 +1,7 @@
 [project]
 name = "ComfyUI-HttpRequestNodes"
 description = "Extended HTTP request nodes for ComfyUI — supports image, audio, video binary data, form-data upload, and raw binary I/O. Fork of felixszeto/ComfyUI-RequestNodes."
-version = "1.1.0"
+version = "1.2.0"
 license = {file = "LICENSE"}
 
 [project.urls]

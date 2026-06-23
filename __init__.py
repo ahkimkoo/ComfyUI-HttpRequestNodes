@@ -18,6 +18,7 @@ from .blob_to_image_node import BlobToImageNode
 from .blob_to_audio_node import BlobToAudioNode
 from .blob_to_video_node import BlobToVideoNode
 from .blob_to_batch_image_node import BlobToBatchImageNode
+from .base64_to_audio_node import Base64ToAudioNode
 
 
 
@@ -40,4 +41,5 @@ NODE_CLASS_MAPPINGS = {
     "Blob To Audio Node": BlobToAudioNode,
     "Blob To Video Node": BlobToVideoNode,
     "Blob To Batch Image Node": BlobToBatchImageNode,
+    "Base64 To Audio Node": Base64ToAudioNode,
 }
